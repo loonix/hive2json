@@ -28,23 +28,6 @@ function removeDuplicates(commands) {
     return commands;
 }
 
-function unescapeSlashes(str) {
-    // add another escaped slash if the string ends with an odd
-    // number of escaped slashes which will crash JSON.parse
-    let parsedStr = str.replace(/(^|[^\\])(\\\\)*\\$/, "$&\\");
-
-    // escape unescaped double quotes to prevent error with
-    // added double quotes in json string
-    parsedStr = parsedStr.replace(/(^|[^\\])((\\\\)*")/g, "$1\\$2");
-
-    try {
-        parsedStr = JSON.parse(`"${parsedStr}"`);
-    } catch (e) {
-        return str;
-    }
-    return parsedStr;
-}
-
 function getFile(event) {
     const input = event.target
     if ('files' in input && input.files.length > 0) {
@@ -71,6 +54,8 @@ function readFileContent(file) {
 }
 
 function generateRows(text) {
+    downloadButton.style.display = 'none';
+
     const output = document.getElementById('output');
     // const text = await (await fetch("commands2.hive")).text();
     result = text.split('\u0000');
@@ -80,7 +65,11 @@ function generateRows(text) {
     result.forEach(row => {
         if (row.substring(0, 2) == '{"') {
             row = row.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '');
-            row = unescapeSlashes(row);
+
+            row = row.replace('":"\"/', '":"');
+            row = row.replace('==\""', '=="');
+            row = row.replace('=\""', '=\"');
+            
             commands.push(row);
         }
     });
