@@ -1,8 +1,25 @@
+var allCommands;
+
+var downloadButton = document.getElementById('download');
+
+
 (function (w) {
     (async () => {
         document.getElementById('file-selector').addEventListener('change', getFile)
+        downloadButton.addEventListener('click', save)
+        downloadButton.style.display = 'none';
+
+
     })();
 })(window);
+
+function hide(el) {
+    el.style.display = 'none';
+}
+
+function show(el, value) {
+    el.style.display = value;
+}
 
 function removeDuplicates(commands) {
     commands.filter(function (value, index, array) {
@@ -76,6 +93,8 @@ function generateRows(text) {
     commands.forEach(el => {
         console.log(el);
     });
+
+    allCommands = commands;
     commands.forEach(element => {
         const li = document.createElement('li');
         output.appendChild(li);
@@ -87,5 +106,25 @@ function generateRows(text) {
     });
 
     hljs.highlightAll();
+    downloadButton.style.display = 'block';
 
+
+}
+
+
+function save() {
+    var filename = 'commands.json';
+    const blob = new Blob(["[" + allCommands + "]"], {
+        type: 'text/json'
+    });
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    } else {
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
 }
