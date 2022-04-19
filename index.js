@@ -67,20 +67,22 @@ function generateRows(text) {
             commands.push(row);
         }
     });
-    console.log(commands)
     console.log('All Commands: ', commands.length)
 
     /// Remove duplicates
     commands = removeDuplicates(commands)
 
     console.log('All Commands (No duplicates): ', commands.length)
-
+    commands.forEach(el => {
+        console.log(el);
+    });
     commands.forEach(element => {
         const li = document.createElement('li');
         output.appendChild(li);
         json = hljs.highlight(element, {
             language: 'json'
-        }).value
+        }).value;
+
         li.innerHTML = '<pre><code class="language-json">' + json + '</code></pre>';
     });
 
